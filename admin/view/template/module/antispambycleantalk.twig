@@ -1,0 +1,130 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="float-end">
+                <button type="submit" form="form-store" data-bs-toggle="tooltip" title="{{ button_save }}"
+                        class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+                <a href="{{ cancel }}" data-bs-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i
+                            class="fa-solid fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="card">
+            {% if error_warning %}
+                <div class="alert alert-danger alert-dismissible">
+                    <i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+            <div class="card-header"><i class="fa-solid fa-pencil"></i> {{ text_edit }}</div>
+            <div class="card-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-store" data-oc-toggle="ajax">
+                    <!-- API KEY -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-access_key">
+                            <span data-toggle="tooltip" title="{{ help_access_key }}">{{ entry_access_key }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="module_antispambycleantalk_access_key"
+                                   value="{{ module_antispambycleantalk_access_key }}"
+                                   placeholder="{{ entry_antispambycleantalk_access_key }}"
+                                   id="antispambycleantalk-access_key" class="form-control"/>
+                        </div>
+                    </div>
+                    <!-- PLUGIN ENABLE -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-enable">
+                            <span data-toggle="tooltip" title="{{ help_enable }}">{{ entry_enable }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="cmodule_antispambycleantalk_status" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_status" value="1" id="antispambycleantalk-enable" class="form-check-input"{% if module_antispambycleantalk_status %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CHECK REGISTRATIONS -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-check_registrations">
+                            <span data-toggle="tooltip" title="{{ help_check_registrations }}">{{ entry_check_registrations }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_antispambycleantalk_check_registrations" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_check_registrations" value="1" id="antispambycleantalk-check_registrations" class="form-check-input"{% if module_antispambycleantalk_check_registrations %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CHECK ORDERS -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-check_orders">
+                            <span data-toggle="tooltip" title="{{ help_check_orders }}">{{ entry_check_orders }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_antispambycleantalk_check_orders" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_check_orders" value="1" id="antispambycleantalk-check_orders" class="form-check-input"{% if module_antispambycleantalk_check_orders %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CHECK RETURNS -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-check_return">
+                            <span data-toggle="tooltip" title="{{ help_check_return }}">{{ entry_check_return }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_antispambycleantalk_check_return" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_check_return" value="1" id="antispambycleantalk-check_return" class="form-check-input"{% if module_antispambycleantalk_check_return %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CHECK CONTACT FORM -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-check_contact_form">
+                            <span data-toggle="tooltip" title="{{ help_check_contact_form }}">{{ entry_check_contact_form }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_antispambycleantalk_check_contact_form" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_check_contact_form" value="1" id="antispambycleantalk-check_contact_form" class="form-check-input"{% if module_antispambycleantalk_check_contact_form %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CHECK REVIEWS -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-check_reviews">
+                            <span data-toggle="tooltip" title="{{ help_check_reviews }}">{{ entry_check_reviews }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_antispambycleantalk_check_reviews" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_check_reviews" value="1" id="antispambycleantalk-check_reviews" class="form-check-input"{% if module_antispambycleantalk_check_reviews %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CHECK ENABLE SFW -->
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="antispambycleantalk-enable_sfw">
+                            <span data-toggle="tooltip" title="{{ help_enable_sfw }}">{{ entry_enable_sfw }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_antispambycleantalk_enable_sfw" value="0"/>
+                                <input type="checkbox" name="module_antispambycleantalk_enable_sfw" value="1" id="antispambycleantalk-enable_sfw" class="form-check-input"{% if module_antispambycleantalk_enable_sfw %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{ footer }}

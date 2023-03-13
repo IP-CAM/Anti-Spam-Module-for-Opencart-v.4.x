@@ -1,0 +1,11 @@
+{
+    "name": "cleantalk/opencart-4-antispam",
+    "require-dev": {
+        "cleantalk/antispam": "^1.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "cleantalk/apbct-installer": true
+        }
+    }
+}
