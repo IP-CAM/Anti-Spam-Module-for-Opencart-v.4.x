@@ -8,6 +8,8 @@ use Cleantalk\Antispam\Helper;
 use Cleantalk\Antispam\RemoteCalls;
 use Cleantalk\Antispam\SFW;
 use Cleantalk\Common\Arr;
+use Opencart\System\Engine\Controller;
+use Opencart\System\Library\Cart\Customer;
 
 class Core
 {
@@ -137,38 +139,35 @@ class Core
     /**
      * Checking if this request is spam ot not.
      *
-     * @param \Opencart\System\Engine\Controller $controller
-     *
+     * @param Controller $controller
+     * @param string $content_type
      * @return bool true|false
      */
-    public function isSpam(\Opencart\System\Engine\Controller $controller)
+    public function isSpam(Controller $controller, $content_type)
     {
-        switch( get_class( $controller ) ) {
-            case 'ControllerAccountRegister'  :
-            case 'ControllerAffiliateRegister':
-            case 'ControllerCheckoutRegister' :
-                $ct_result = $this->onSpamCheck( 'register', $controller->request->post );
+        switch( $content_type ) {
+            case 'register' :
+                $ct_result = $this->onSpamCheck('register', $controller->request->post);
                 break;
-            case 'ControllerJournal3Checkout' :
-                $ct_result = $this->onSpamCheck( 'register', $controller->request->post['order_data'] );
+            case 'order' :
+                /** @var Customer $customer */
+                $customer = $controller->cart->customer;
+                $data['email'] = $customer->getEmail();
+                $data['firstname'] = $customer->getFirstName();
+                $data['lastname'] = $customer->getLastName();
+                $ct_result = $this->onSpamCheck('order', $data);
                 break;
-            case 'ControllerCheckoutGuest' :
-                $ct_result = $this->onSpamCheck( 'order', $controller->request->post );
+            case 'comment' :
+                $ct_result = $this->onSpamCheck('comment', $controller->request->post);
                 break;
-            case 'ControllerProductProduct' :
-                $ct_result = $this->onSpamCheck( 'comment', $controller->request->post );
+            case 'contact' :
+                $ct_result = $this->onSpamCheck('contact', $controller->request->post);
                 break;
-            case 'ControllerInformationContact' :
-                $ct_result = $this->onSpamCheck( 'contact', $controller->request->post );
-                break;
-            case 'ControllerJournal3Form'       :
-                $ct_result = $this->onSpamCheck( 'general_comment', $controller->request->post['item'] );
-                break;
-            case 'ControllerAccountReturn' :
-                $ct_result = $this->onSpamCheck( 'return', $controller->request->post );
+            case 'return' :
+                $ct_result = $this->onSpamCheck('return', $controller->request->post);
                 break;
             default:
-                $ct_result = $this->onSpamCheck( 'general_comment', $controller->request->post );
+                $ct_result = $this->onSpamCheck('general_comment', $controller->request->post);
                 break;
 
         }
@@ -236,7 +235,7 @@ class Core
             case 'order':
                 $ct_request->sender_email = $data['email'];
                 $ct_request->sender_nickname = trim($data['firstname']).' '.trim($data['lastname']);
-                $ct_result = $ct->isAllowUser($ct_request);
+                $ct_result = $ct->isAllowMessage($ct_request);
                 break;
             case 'contact':
                 $ct_request->sender_email = $data['email'];

@@ -129,6 +129,7 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
                 $this->event . '|addHiddenField' => [
                     'catalog/view/account/register/after',
                     'catalog/view/checkout/register/after',
+                    'catalog/view/account/returns_form',
                 ]
             ],
             'checking register' => [
@@ -136,7 +137,17 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
                     'catalog/controller/account/register|register/before',
                     'catalog/controller/checkout/register|save/before',
                 ]
-            ]
+            ],
+            /*'checking order' => [
+                $this->event . '|checkOrder' => [
+                    'catalog/controller/checkout/checkout/before',
+                ]
+            ],*/
+            'checking returns' => [
+                $this->event . '|checkReturns' => [
+                    'catalog/controller/account/returns|save/before',
+                ]
+            ],
         ];
         foreach ( $events as $event_description => $event_group ) {
             foreach ( $event_group as $event_name => $events ) {
