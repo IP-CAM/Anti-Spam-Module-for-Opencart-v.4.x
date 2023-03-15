@@ -119,30 +119,39 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         ]);
 
         $this->model_setting_event->deleteEventByCode($this->module);
-        $this->model_setting_event->addEvent([
-            'code'			=> $this->module,
-            'description'	=> 'Hook: Anti-Spam by CleanTalk injecting JS to the document',
-            'trigger'		=> 'catalog/controller/common/header/before',
-            'action'		=> $this->event . '|injectJs',
-            'status'		=> true,
-            'sort_order'	=> 1
-        ]);
-        $this->model_setting_event->addEvent([
-            'code'			=> $this->module,
-            'description'	=> 'Hook: Anti-Spam by CleanTalk checking register',
-            'trigger'		=> 'catalog/controller/account/register|register/before',
-            'action'		=> $this->event . '|checkRegister',
-            'status'		=> true,
-            'sort_order'	=> 1
-        ]);
-        $this->model_setting_event->addEvent([
-            'code'			=> $this->module,
-            'description'	=> 'Hook: Anti-Spam by CleanTalk adding hidden field',
-            'trigger'		=> 'catalog/view/account/register/after',
-            'action'		=> $this->event . '|addHiddenField',
-            'status'		=> true,
-            'sort_order'	=> 1
-        ]);
+        $events = [
+            'injecting JS to the document' => [
+                $this->event . '|injectJs' => [
+                    'catalog/controller/common/header/before',
+                ]
+            ],
+            'adding hidden field' => [
+                $this->event . '|addHiddenField' => [
+                    'catalog/view/account/register/after',
+                    'catalog/view/checkout/register/after',
+                ]
+            ],
+            'checking register' => [
+                $this->event . '|checkRegister' => [
+                    'catalog/controller/account/register|register/before',
+                    'catalog/controller/checkout/register|save/before',
+                ]
+            ]
+        ];
+        foreach ( $events as $event_description => $event_group ) {
+            foreach ( $event_group as $event_name => $events ) {
+                foreach ( $events as $event ) {
+                    $this->model_setting_event->addEvent([
+                        'code'			=> $this->module,
+                        'description'	=> 'Hook: Anti-Spam by CleanTalk ' . $event_description,
+                        'trigger'		=> $event,
+                        'action'		=> $event_name,
+                        'status'		=> true,
+                        'sort_order'	=> 1
+                    ]);
+                }
+            }
+        }
 
         $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "cleantalk_sfw` (
             `network` int(10) unsigned NOT NULL, 
@@ -171,6 +180,7 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         if ($this->user->hasPermission('modify', $this->path)) {
             $this->load->model('setting/setting');
             $this->model_setting_setting->deleteSetting($this->module);
+            $this->model_setting_startup->deleteStartupByCode($this->module);
             $this->model_setting_event->deleteEventByCode($this->module);
             $this->db->query("DROP TABLE IF EXISTS " . DB_PREFIX . "cleantalk_sfw");
             $this->db->query("DROP TABLE IF EXISTS " . DB_PREFIX . "cleantalk_sfw_logs");

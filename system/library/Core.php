@@ -213,8 +213,8 @@ class Core
         if (isset($_POST['ct_checkjs']) && $_POST['ct_checkjs'] == date("Y"))
             $js_on = 1;
         $ct = new Cleantalk();
-        $ct->work_url = 'http://moderate.cleantalk.org';
-        $ct->server_url = 'http://moderate.cleantalk.org';
+        $ct->work_url = 'https://moderate.cleantalk.org';
+        $ct->server_url = 'https://moderate.cleantalk.org';
         $ct_request = new CleantalkRequest();
         $ct_request->auth_key = $this->ct_access_key;
         $ct_request->sender_ip       = Helper::ip__get(array('real'), false);
@@ -225,6 +225,7 @@ class Core
         $ct_request->sender_info = $sender_info;
         $ct_request->submit_time = isset($_COOKIE['apbct_timestamp']) ? time() - intval($_COOKIE['apbct_timestamp']) : 0;
         $ct_request->post_info = $post_info;
+        $ct_request->event_token = $_POST['ct_bot_detector_event_token'] ?? null;
         switch ($content_type)
         {
             case 'register':
