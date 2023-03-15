@@ -7,6 +7,7 @@ use Cleantalk\Antispam\CleantalkRequest;
 use Cleantalk\Antispam\Helper;
 use Cleantalk\Antispam\RemoteCalls;
 use Cleantalk\Antispam\SFW;
+use Cleantalk\Common\Arr;
 
 class Core
 {
@@ -136,11 +137,11 @@ class Core
     /**
      * Checking if this request is spam ot not.
      *
-     * @param \Controller $controller
+     * @param \Opencart\System\Engine\Controller $controller
      *
      * @return bool true|false
      */
-    public function is_spam(\Controller $controller )
+    public function isSpam(\Opencart\System\Engine\Controller $controller)
     {
         switch( get_class( $controller ) ) {
             case 'ControllerAccountRegister'  :
@@ -514,7 +515,7 @@ class Core
     }
 
     private function apbct_array( $array ){
-        return new \module\antispambycleantalk\Cleantalk\Common\Arr( $array );
+        return new Arr( $array );
     }
 
 }

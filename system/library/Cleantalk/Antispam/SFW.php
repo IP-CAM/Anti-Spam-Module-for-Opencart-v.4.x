@@ -343,7 +343,7 @@ class SFW
 
 	private function get_sfw_file( $api_key, $immediate )
     {
-        $result = API::method__get_2s_blacklists_db( $api_key, 'multifiles', '2_0' );
+        $result = API::method__get_2s_blacklists_db( $api_key, 'multifiles', '3_2' );
 
         if( empty( $result['error'] ) ){
 

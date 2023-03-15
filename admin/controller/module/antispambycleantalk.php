@@ -28,25 +28,16 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         'enable_sfw'
     ];
 
+    /**
+     * @var string
+     */
+    private $event = 'extension/antispambycleantalk/event/antispambycleantalk';
+
     public function index()
     {
         $this->load->language($this->path);
 
         $this->document->setTitle($this->language->get('heading_title_without_logo'));
-
-        /*if (($this->request->server['REQUEST_METHOD'] == 'POST')) {
-            if (isset($this->request->post['module_antispambycleantalk_enable_sfw']) && isset($this->request->post['module_antispambycleantalk_access_key'])) {
-                $this->apbct->sfw->sfw_update($this->request->post['module_antispambycleantalk_access_key']);
-                $this->apbct->sfw->logs__send($this->request->post['module_antispambycleantalk_access_key']);
-                $this->request->post['module_antispambycleantalk_int_sfw_last_check'] = time();
-                $this->request->post['module_antispambycleantalk_int_sfw_last_send_logs'] = time();
-            }
-            $this->model_setting_setting->editSetting('module_antispambycleantalk', $this->request->post);
-
-            $this->session->data['success'] = $this->language->get('text_success');
-
-            $this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true));
-        }*/
 
         $data['breadcrumbs'] = array();
 
@@ -75,7 +66,6 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         $data['footer'] = $this->load->controller('common/footer');
 
         // Get settings value from DB
-        $this->load->model('setting/setting');
         foreach ( $this->settings as $setting_name ) {
             $data[$this->module . '_' . $setting_name] = $this->config->get($this->module . '_' . $setting_name);
         }
@@ -124,6 +114,32 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             'code'			=> $this->module,
             'description'	=> 'Anti-Spam by CleanTalk',
             'action'		=> 'admin/extension/antispambycleantalk/startup/antispambycleantalk',
+            'status'		=> true,
+            'sort_order'	=> 1
+        ]);
+
+        $this->model_setting_event->deleteEventByCode($this->module);
+        $this->model_setting_event->addEvent([
+            'code'			=> $this->module,
+            'description'	=> 'Hook: Anti-Spam by CleanTalk injecting JS to the document',
+            'trigger'		=> 'catalog/controller/common/header/before',
+            'action'		=> $this->event . '|injectJs',
+            'status'		=> true,
+            'sort_order'	=> 1
+        ]);
+        $this->model_setting_event->addEvent([
+            'code'			=> $this->module,
+            'description'	=> 'Hook: Anti-Spam by CleanTalk checking register',
+            'trigger'		=> 'catalog/controller/account/register|register/before',
+            'action'		=> $this->event . '|checkRegister',
+            'status'		=> true,
+            'sort_order'	=> 1
+        ]);
+        $this->model_setting_event->addEvent([
+            'code'			=> $this->module,
+            'description'	=> 'Hook: Anti-Spam by CleanTalk adding hidden field',
+            'trigger'		=> 'catalog/view/account/register/after',
+            'action'		=> $this->event . '|addHiddenField',
             'status'		=> true,
             'sort_order'	=> 1
         ]);
