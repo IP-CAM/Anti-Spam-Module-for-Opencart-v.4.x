@@ -43,6 +43,7 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             '@<form\sid="form-register".*>@',
             '@<form\sid="form-return".*>@',
             '@<form\sid="form-contact".*>@',
+            '@<form\sid="form-review".*>@',
         ];
 
         $output = preg_replace_callback($forms_patterns, function ($matches){
@@ -142,6 +143,23 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
     }
 
     /**
+     * (HOOK) Event handler
+     *
+     * @param string $route
+     * @param array $args
+     *
+     * @return void
+     */
+    public function checkReviews(&$route, &$args)
+    {
+        if ( ! $this->config->get('module_antispambycleantalk_status') || ! $this->config->get('module_antispambycleantalk_check_reviews')  ) {
+            return;
+        }
+
+        $this->check('comment');
+    }
+
+    /**
      * Wrapper for checking spam by various comment types
      *
      * @param string $content_type
@@ -151,7 +169,6 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
     private function check($content_type = '')
     {
         if( $this->extension_antispambycleantalk_core->isSpam($this, $content_type) ) {
-            //$this->response->setOutput($this->load->view('extension/antispambycleantalk/module/antispambycleantalk', ['block_message'=>$this->extension_antispambycleantalk_core->get_block_comment()]));
             $json['error']['warning'] = $this->extension_antispambycleantalk_core->get_block_comment();
             die(json_encode($json));
         }
