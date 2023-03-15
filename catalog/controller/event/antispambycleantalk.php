@@ -42,6 +42,7 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         $forms_patterns = [
             '@<form\sid="form-register".*>@',
             '@<form\sid="form-return".*>@',
+            '@<form\sid="form-contact".*>@',
         ];
 
         $output = preg_replace_callback($forms_patterns, function ($matches){
@@ -106,6 +107,14 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         }
     }
 
+    /**
+     * (HOOK) Event handler
+     *
+     * @param string $route
+     * @param array $args
+     *
+     * @return void
+     */
     public function checkReturns(&$route, &$args)
     {
         if ( ! $this->config->get('module_antispambycleantalk_status') || ! $this->config->get('module_antispambycleantalk_check_return')  ) {
@@ -113,6 +122,23 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         }
 
         $this->check('return');
+    }
+
+    /**
+     * (HOOK) Event handler
+     *
+     * @param string $route
+     * @param array $args
+     *
+     * @return void
+     */
+    public function checkContactForm(&$route, &$args)
+    {
+        if ( ! $this->config->get('module_antispambycleantalk_status') || ! $this->config->get('module_antispambycleantalk_check_contact_form')  ) {
+            return;
+        }
+
+        $this->check('contact');
     }
 
     /**

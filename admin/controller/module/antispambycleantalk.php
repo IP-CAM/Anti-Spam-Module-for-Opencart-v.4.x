@@ -130,6 +130,7 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
                     'catalog/view/account/register/after',
                     'catalog/view/checkout/register/after',
                     'catalog/view/account/returns_form',
+                    'catalog/view/information/contact',
                 ]
             ],
             'checking register' => [
@@ -146,6 +147,11 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             'checking returns' => [
                 $this->event . '|checkReturns' => [
                     'catalog/controller/account/returns|save/before',
+                ]
+            ],
+            'checking contact form' => [
+                $this->event . '|checkContactForm' => [
+                    'catalog/controller/information/contact|send/before',
                 ]
             ],
         ];
