@@ -13,7 +13,7 @@ use Opencart\System\Library\Cart\Customer;
 
 class Core
 {
-    const VERSION = '4.0';
+    const VERSION = '1.0';
 
     /**
      * @var string
@@ -61,7 +61,7 @@ class Core
 
         $this->autoloader();
         require_once 'php_fix.php';
-        $this->agent = 'opencart-' . $this->getVersion();
+        $this->agent = 'opencart4-' . $this->getVersion();
         $this->rc = new RemoteCalls($db, DB_PREFIX);
         $this->sfw = new SFW($db, DB_PREFIX);
         $this->ct_access_key = $config->get('module_antispambycleantalk_access_key');
