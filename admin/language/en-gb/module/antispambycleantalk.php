@@ -4,33 +4,33 @@ $cleantalk_logo_svg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABFkAAARBCAY
 
 // Heading
 $_['heading_title_without_logo'] = 'Antispam by Cleantalk';
-$_['heading_title']    = '<img src="'.$cleantalk_logo_svg.'" alt="CleanTalk logo" width="30" /> Antispam by Cleantalk';
+$_['heading_title'] = '<img src="' . $cleantalk_logo_svg . '" alt="CleanTalk logo" width="30" /> Antispam by Cleantalk';
 
 // Text
-$_['text_extension']            = 'Extensions';
-$_['text_success']              = 'Success: You have modified Anti-Spam by CleanTalk module!';
-$_['text_edit']                 = 'Edit Anti-Spam by CleanTalk Module';
-$_['text_all_category']         = 'All';
+$_['text_extension'] = 'Extensions';
+$_['text_success'] = 'Success: You have modified Anti-Spam by CleanTalk module!';
+$_['text_edit'] = 'Edit Anti-Spam by CleanTalk Module';
+$_['text_all_category'] = 'All';
 
 // Entry
-$_['entry_enable']              = 'Enable Anti-Spam';
+$_['entry_enable'] = 'Enable Anti-Spam';
 $_['entry_check_registrations'] = 'Check registrations';
-$_['entry_check_orders']        = 'Check orders';
-$_['entry_check_return']        = 'Check returns';
-$_['entry_check_contact_form']  = 'Check contact form';
-$_['entry_check_reviews']       = 'Check reviews';
-$_['entry_enable_sfw']          = 'Enable SpamFireWall';
-$_['entry_access_key']          = 'Access key';
+$_['entry_check_orders'] = 'Check orders';
+$_['entry_check_return'] = 'Check returns';
+$_['entry_check_contact_form'] = 'Check contact form';
+$_['entry_check_reviews'] = 'Check reviews';
+$_['entry_enable_sfw'] = 'Enable SpamFireWall';
+$_['entry_access_key'] = 'Access key';
 
 // Help
-$_['help_enable']               = 'Enable Anti-Spam by CleanTalk';
-$_['help_check_registrations']  = 'Anti-Spam by CleanTalk will check registrations on your website';
-$_['help_check_orders']         = 'Anti-Spam by CleanTalk will check orders on your website';
-$_['help_check_return']         = 'Anti-Spam by CleanTalk will check returns on your website';
-$_['help_check_contact_form']   = 'Anti-Spam by CleanTalk will check contact form on your website';
-$_['help_check_reviews']        = 'Anti-Spam by CleanTalk will check product reviews on your website';
-$_['help_enable_sfw']           = 'Reduces webserver load and prevents bots to access the website';
-$_['help_access_key']           = 'To get an access key, please visit: https://cleantalk.org';
+$_['help_enable'] = 'Enable Anti-Spam by CleanTalk';
+$_['help_check_registrations'] = 'Anti-Spam by CleanTalk will check registrations on your website';
+$_['help_check_orders'] = 'Anti-Spam by CleanTalk will check orders on your website';
+$_['help_check_return'] = 'Anti-Spam by CleanTalk will check returns on your website';
+$_['help_check_contact_form'] = 'Anti-Spam by CleanTalk will check contact form on your website';
+$_['help_check_reviews'] = 'Anti-Spam by CleanTalk will check product reviews on your website';
+$_['help_enable_sfw'] = 'Reduces webserver load and prevents bots to access the website';
+$_['help_access_key'] = 'To get an access key, please visit: https://cleantalk.org';
 
 // Error
-$_['error_permission']          = 'Warning: You do not have permission to modify Anti-Spam by CleanTalk module!';
+$_['error_permission'] = 'Warning: You do not have permission to modify Anti-Spam by CleanTalk module!';

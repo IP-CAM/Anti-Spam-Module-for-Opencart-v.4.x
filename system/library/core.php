@@ -46,7 +46,8 @@ class Core
      *
      * @return string
      */
-    public function getVersion() {
+    public function getVersion()
+    {
         return self::VERSION;
     }
 
@@ -55,9 +56,9 @@ class Core
      */
     public function __construct($parameters)
     {
-        $db = $parameters[0] ?? null;
-        $config = $parameters[1] ?? null;
-        $controller = $parameters[2] ?? null;
+        $db = isset($parameters[0]) ? $parameters[0] : null;
+        $config = isset($parameters[1]) ? $parameters[1] : null;
+        $controller = isset($parameters[2]) ? $parameters[2] : null;
 
         $this->autoloader();
         require_once 'php_fix.php';
@@ -65,12 +66,13 @@ class Core
         $this->rc = new RemoteCalls($db, DB_PREFIX);
         $this->sfw = new SFW($db, DB_PREFIX);
         $this->ct_access_key = $config->get('module_antispambycleantalk_access_key');
-        if( $controller ) {
+        if ( $controller ) {
             $this->setCookie();
         }
     }
 
-    private function autoloader() {
+    private function autoloader()
+    {
         /**
          * Autoloader for \Cleantalk\* classes
          *
@@ -78,13 +80,13 @@ class Core
          *
          * @return void
          */
-        spl_autoload_register( function( $class ){
+        spl_autoload_register(function ($class) {
             // Register class auto loader
             // Custom modules1
-            if(strpos($class, 'Cleantalk') !== false){
+            if ( strpos($class, 'Cleantalk') !== false ) {
                 $class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
                 $class_file = __DIR__ . DIRECTORY_SEPARATOR . $class . '.php';
-                if(file_exists($class_file)){
+                if ( file_exists($class_file) ) {
                     require_once($class_file);
                 }
             }
@@ -99,39 +101,39 @@ class Core
             'check_value' => $this->ct_access_key,
         );
         // Pervious referer
-        if(!empty($_SERVER['HTTP_REFERER'])){
-            Helper::apbct_cookie__set('apbct_prev_referer', $_SERVER['HTTP_REFERER'], 0, '/');
+        if ( !empty($_SERVER['HTTP_REFERER']) ) {
+            Helper::apbctCookieSet('apbct_prev_referer', $_SERVER['HTTP_REFERER'], 0, '/');
             $cookie_test_value['cookies_names'][] = 'apbct_prev_referer';
             $cookie_test_value['check_value'] .= $_SERVER['HTTP_REFERER'];
         }
         // Submit time
         $apbct_timestamp = time();
-        Helper::apbct_cookie__set('apbct_timestamp', $apbct_timestamp, 0, '/');
+        Helper::apbctCookieSet('apbct_timestamp', $apbct_timestamp, 0, '/');
         $cookie_test_value['cookies_names'][] = 'apbct_timestamp';
         $cookie_test_value['check_value'] .= $apbct_timestamp;
 
         // Cookies test
         $cookie_test_value['check_value'] = md5($cookie_test_value['check_value']);
-        Helper::apbct_cookie__set('apbct_cookies_test', json_encode($cookie_test_value), 0, '/');
+        Helper::apbctCookieSet('apbct_cookies_test', json_encode($cookie_test_value), 0, '/');
     }
 
     public function apbctCookiesTest()
     {
-        if(isset($_COOKIE['apbct_cookies_test'])){
-
+        if ( isset($_COOKIE['apbct_cookies_test']) ) {
             $cookie_test = json_decode(stripslashes($_COOKIE['apbct_cookies_test']), true);
 
             $check_srting = $this->ct_access_key;
-            foreach($cookie_test['cookies_names'] as $cookie_name){
+            foreach ( $cookie_test['cookies_names'] as $cookie_name ) {
                 $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
-            } unset($cokie_name);
+            }
+            unset($cokie_name);
 
-            if($cookie_test['check_value'] == md5($check_srting)){
+            if ( $cookie_test['check_value'] == md5($check_srting) ) {
                 return 1;
-            }else{
+            } else {
                 return 0;
             }
-        }else{
+        } else {
             return null;
         }
     }
@@ -145,11 +147,11 @@ class Core
      */
     public function isSpam(Controller $controller, $content_type)
     {
-        switch( $content_type ) {
-            case 'register' :
+        switch ( $content_type ) {
+            case 'register':
                 $ct_result = $this->onSpamCheck('register', $controller->request->post);
                 break;
-            case 'order' :
+            case 'order':
                 /** @var Customer $customer */
                 $customer = $controller->cart->customer;
                 $data['email'] = $customer->getEmail();
@@ -157,19 +159,18 @@ class Core
                 $data['lastname'] = $customer->getLastName();
                 $ct_result = $this->onSpamCheck('order', $data);
                 break;
-            case 'comment' :
+            case 'comment':
                 $ct_result = $this->onSpamCheck('comment', $controller->request->post);
                 break;
-            case 'contact' :
+            case 'contact':
                 $ct_result = $this->onSpamCheck('contact', $controller->request->post);
                 break;
-            case 'return' :
+            case 'return':
                 $ct_result = $this->onSpamCheck('return', $controller->request->post);
                 break;
             default:
                 $ct_result = $this->onSpamCheck('general_comment', $controller->request->post);
                 break;
-
         }
         if ( $ct_result['allow'] == 0 ) {
             $this->comment = $ct_result['comment'];
@@ -179,7 +180,7 @@ class Core
         }
     }
 
-    public function get_block_comment()
+    public function getBlockComment()
     {
         return $this->comment;
     }
@@ -191,17 +192,22 @@ class Core
 
         $sender_info = json_encode(array(
             'REFFERRER' => isset($_SERVER['HTTP_REFERER']) ? htmlspecialchars($_SERVER['HTTP_REFERER']) : null,
-            'page_url' => isset($_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI']) ? htmlspecialchars($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']) : null,
+            'page_url' => isset($_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI']) ? htmlspecialchars(
+                $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']
+            ) : null,
             'USER_AGENT' => isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT']) : null,
             'fields_number' => sizeof($data),
             'REFFERRER_PREVIOUS' => isset($_COOKIE['apbct_prev_referer']) ? $_COOKIE['apbct_prev_referer'] : null,
             'cookies_enabled' => $this->apbctCookiesTest(),
-            'mouse_cursor_positions' => isset($_COOKIE['apbct_pointer_data']) ? json_decode(stripslashes($_COOKIE['apbct_pointer_data']), true) : null,
-            'js_timezone'            => isset($_COOKIE['apbct_timezone']) ? $_COOKIE['apbct_timezone'] : null,
-            'key_press_timestamp'    => isset($_COOKIE['apbct_fkp_timestamp']) ? $_COOKIE['apbct_fkp_timestamp'] : null,
-            'page_set_timestamp'     => isset($_COOKIE['apbct_ps_timestamp']) ? $_COOKIE['apbct_ps_timestamp'] : null,
-            'form_visible_inputs'    => !empty($_COOKIE['apbct_visible_fields_count']) ? $_COOKIE['apbct_visible_fields_count'] : null,
-            'apbct_visible_fields'   => !empty($_COOKIE['apbct_visible_fields']) ? $_COOKIE['apbct_visible_fields'] : null,
+            'mouse_cursor_positions' => isset($_COOKIE['apbct_pointer_data']) ? json_decode(
+                stripslashes($_COOKIE['apbct_pointer_data']),
+                true
+            ) : null,
+            'js_timezone' => isset($_COOKIE['apbct_timezone']) ? $_COOKIE['apbct_timezone'] : null,
+            'key_press_timestamp' => isset($_COOKIE['apbct_fkp_timestamp']) ? $_COOKIE['apbct_fkp_timestamp'] : null,
+            'page_set_timestamp' => isset($_COOKIE['apbct_ps_timestamp']) ? $_COOKIE['apbct_ps_timestamp'] : null,
+            'form_visible_inputs' => !empty($_COOKIE['apbct_visible_fields_count']) ? $_COOKIE['apbct_visible_fields_count'] : null,
+            'apbct_visible_fields' => !empty($_COOKIE['apbct_visible_fields']) ? $_COOKIE['apbct_visible_fields'] : null,
 
         ));
         $post_info = json_encode(array(
@@ -209,32 +215,32 @@ class Core
             'post_url' => isset($_SERVER['HTTP_REFERER']) ? htmlspecialchars($_SERVER['HTTP_REFERER']) : null,
         ));
         $js_on = 0;
-        if (isset($_POST['ct_checkjs']) && $_POST['ct_checkjs'] == date("Y"))
+        if ( isset($_POST['ct_checkjs']) && $_POST['ct_checkjs'] == date("Y") ) {
             $js_on = 1;
+        }
         $ct = new Cleantalk();
         $ct->work_url = 'https://moderate.cleantalk.org';
         $ct->server_url = 'https://moderate.cleantalk.org';
         $ct_request = new CleantalkRequest();
         $ct_request->auth_key = $this->ct_access_key;
-        $ct_request->sender_ip       = Helper::ip__get(array('real'), false);
-        $ct_request->x_forwarded_for = Helper::ip__get(array('x_forwarded_for'), false);
-        $ct_request->x_real_ip       = Helper::ip__get(array('x_real_ip'), false);
+        $ct_request->sender_ip = Helper::ipGet(array('real'), false);
+        $ct_request->x_forwarded_for = Helper::ipGet(array('x_forwarded_for'), false);
+        $ct_request->x_real_ip = Helper::ipGet(array('x_real_ip'), false);
         $ct_request->agent = $this->agent;
         $ct_request->js_on = $js_on;
         $ct_request->sender_info = $sender_info;
-        $ct_request->submit_time = isset($_COOKIE['apbct_timestamp']) ? time() - intval($_COOKIE['apbct_timestamp']) : 0;
+        $ct_request->submit_time = isset($_COOKIE['apbct_timestamp']) ? time() - (int)$_COOKIE['apbct_timestamp'] : 0;
         $ct_request->post_info = $post_info;
-        $ct_request->event_token = $_POST['ct_bot_detector_event_token'] ?? null;
-        switch ($content_type)
-        {
+        $ct_request->event_token = isset($_POST['ct_bot_detector_event_token']) ? (string)$_POST['ct_bot_detector_event_token'] : null;
+        switch ( $content_type ) {
             case 'register':
                 $ct_request->sender_email = $data['email'];
-                $ct_request->sender_nickname = trim($data['firstname']).' '.trim($data['lastname']);
+                $ct_request->sender_nickname = trim($data['firstname']) . ' ' . trim($data['lastname']);
                 $ct_result = $ct->isAllowUser($ct_request);
                 break;
             case 'order':
                 $ct_request->sender_email = $data['email'];
-                $ct_request->sender_nickname = trim($data['firstname']).' '.trim($data['lastname']);
+                $ct_request->sender_nickname = trim($data['firstname']) . ' ' . trim($data['lastname']);
                 $ct_result = $ct->isAllowMessage($ct_request);
                 break;
             case 'contact':
@@ -254,29 +260,24 @@ class Core
                 $ct_request->message = trim($data['comment']);
                 $ct_result = $ct->isAllowMessage($ct_request);
                 break;
-            case 'general_comment' :
-                $fields = $this->get_fields_any( $data );
-                $ct_request->sender_email    = ($fields['email']    ? $fields['email']    : '');
+            case 'general_comment':
+                $fields = $this->getFieldsAny($data);
+                $ct_request->sender_email = ($fields['email'] ? $fields['email'] : '');
                 $ct_request->sender_nickname = ($fields['nickname'] ? $fields['nickname'] : '');
-                $ct_request->message         = ($fields['message']  ? implode( "\n\n", $fields['message'] )  : '');
+                $ct_request->message = ($fields['message'] ? implode("\n\n", $fields['message']) : '');
                 $ct_result = $ct->isAllowMessage($ct_request);
                 break;
         }
-        if (isset($ct_result))
-        {
-            if ($ct_result->errno != 0){
+        if ( isset($ct_result) ) {
+            if ( $ct_result->errno != 0 ) {
                 //TODO: inform admin
                 $ret_val['errno'] = $ct_result->errno;
-                if ($js_on == 0)
-                {
+                if ( $js_on == 0 ) {
                     $ret_val['allow'] = 0;
                     $ret_val['comment'] = 'Cleantalk. Javascript Disabled';
                 }
-            }
-            else
-            {
-                if ($ct_result->allow == 0)
-                {
+            } else {
+                if ( $ct_result->allow == 0 ) {
                     $ret_val['allow'] = 0;
                     $ret_val['comment'] = $ct_result->comment;
                 }
@@ -290,15 +291,22 @@ class Core
     * Get data from an ARRAY recursively
     * @return array
     */
-    private function get_fields_any($arr, $message=array(), $email = null, $nickname = array('nick' => '', 'first' => '', 'last' => ''), $subject = null, $contact = true, $prev_name = ''){
-
+    private function getFieldsAny(
+        $arr,
+        $message = array(),
+        $email = null,
+        $nickname = array('nick' => '', 'first' => '', 'last' => ''),
+        $subject = null,
+        $contact = true,
+        $prev_name = ''
+    ) {
         //Skip request if fields exists
         $skip_params = array(
-            'ipn_track_id', 	// PayPal IPN #
-            'txn_type', 		// PayPal transaction type
-            'payment_status', 	// PayPal payment status
-            'ccbill_ipn', 		// CCBill IPN
-            'ct_checkjs', 		// skip ct_checkjs field
+            'ipn_track_id',    // PayPal IPN #
+            'txn_type',        // PayPal transaction type
+            'payment_status',    // PayPal payment status
+            'ccbill_ipn',        // CCBill IPN
+            'ct_checkjs',        // skip ct_checkjs field
             'api_mode',         // DigiStore-API
             'loadLastCommentId' // Plugin: WP Discuz. ticket_id=5571
         );
@@ -371,133 +379,140 @@ class Core
             'edd_action', // Easy Digital Downloads
         );
 
-        if( $this->apbct_array( array( $_POST, $_GET ) )->get_keys( $skip_params )->result() )
+        if ( $this->apbctArray(array($_POST, $_GET))->getKeys($skip_params)->result() ) {
             $contact = false;
+        }
 
-        if(count($arr)){
-
-            foreach($arr as $key => $value){
-
-                if(gettype($value) == 'string'){
-
+        if ( count($arr) ) {
+            foreach ( $arr as $key => $value ) {
+                if ( gettype($value) == 'string' ) {
                     $tmp = strpos($value, '\\') !== false ? stripslashes($value) : $value;
                     $decoded_json_value = json_decode($tmp, true);
 
                     // Decoding JSON
-                    if($decoded_json_value !== null){
+                    if ( $decoded_json_value !== null ) {
                         $value = $decoded_json_value;
 
                         // Ajax Contact Forms. Get data from such strings:
                         // acfw30_name %% Blocked~acfw30_email %% s@cleantalk.org
                         // acfw30_textarea %% msg
-                    }elseif(preg_match('/^\S+\s%%\s\S+.+$/', $value)){
+                    } elseif ( preg_match('/^\S+\s%%\s\S+.+$/', $value) ) {
                         $value = explode('~', $value);
-                        foreach ($value as &$val){
+                        foreach ( $value as &$val ) {
                             $tmp = explode(' %% ', $val);
                             $val = array($tmp[0] => $tmp[1]);
                         }
                     }
                 }
 
-                if(!is_array($value) && !is_object($value)){
-
-                    if (in_array($key, $skip_params, true) && $key != 0 && $key != '' || preg_match("/^ct_checkjs/", $key))
+                if ( !is_array($value) && !is_object($value) ) {
+                    if (
+                        in_array($key, $skip_params, true) &&
+                        $key != 0 &&
+                        ( $key != '' || 0 === strpos($key, "ct_checkjs"))
+                    ) {
                         $contact = false;
+                    }
 
-                    if($value === '')
+                    if ( $value === '' ) {
                         continue;
+                    }
 
                     // Skipping fields names with strings from (array)skip_fields_with_strings
-                    foreach($skip_fields_with_strings as $needle){
-                        if (preg_match("/".$needle."/", $prev_name.$key) == 1){
+                    foreach ( $skip_fields_with_strings as $needle ) {
+                        if ( preg_match("/" . $needle . "/", $prev_name . $key) == 1 ) {
                             continue(2);
                         }
-                    }unset($needle);
+                    }
+                    unset($needle);
 
                     // Obfuscating params
-                    foreach($obfuscate_params as $needle){
-                        if (strpos($key, $needle) !== false){
-                            $value = $this->obfuscate_param($value);
+                    foreach ( $obfuscate_params as $needle ) {
+                        if ( strpos($key, $needle) !== false ) {
+                            $value = $this->obfuscateParam($value);
                             continue(2);
                         }
-                    }unset($needle);
+                    }
+                    unset($needle);
 
-                    $value_for_email = trim( $value);    // Removes shortcodes to do better spam filtration on server side.
+                    $value_for_email = trim(
+                        $value
+                    );    // Removes shortcodes to do better spam filtration on server side.
 
                     // Email
-                    if ( ! $email && preg_match( "/^\S+@\S+\.\S+$/", $value_for_email ) ) {
+                    if ( !$email && preg_match("/^\S+@\S+\.\S+$/", $value_for_email) ) {
                         $email = $value_for_email;
 
                         // Removes whitespaces
-                        $value = urldecode( trim( $value ) ); // Fully cleaned message
+                        $value = urldecode(trim($value)); // Fully cleaned message
 
                         // Names
-                    }elseif (preg_match("/name/i", $key)){
-
+                    } elseif ( preg_match("/name/i", $key) ) {
                         preg_match("/((name.?)?(your|first|for)(.?name)?)/", $key, $match_forename);
                         preg_match("/((name.?)?(last|family|second|sur)(.?name)?)/", $key, $match_surname);
                         preg_match("/(name.?)?(nick|user)(.?name)?/", $key, $match_nickname);
 
-                        if(count($match_forename) > 1)
+                        if ( count($match_forename) > 1 ) {
                             $nickname['first'] = $value;
-                        elseif(count($match_surname) > 1)
+                        } elseif ( count($match_surname) > 1 ) {
                             $nickname['last'] = $value;
-                        elseif(count($match_nickname) > 1)
+                        } elseif ( count($match_nickname) > 1 ) {
                             $nickname['nick'] = $value;
-                        else
-                            $message[$prev_name.$key] = $value;
-
+                        } else {
+                            $message[$prev_name . $key] = $value;
+                        }
                         // Subject
-                    }elseif ($subject === null && preg_match("/subject/i", $key)){
+                    } elseif ( $subject === null && preg_match("/subject/i", $key) ) {
                         $subject = $value;
-
                         // Message
-                    }else{
-                        $message[$prev_name.$key] = $value;
+                    } else {
+                        $message[$prev_name . $key] = $value;
                     }
-
-                }elseif(!is_object($value)){
-
+                } elseif ( !is_object($value) ) {
                     $prev_name_original = $prev_name;
-                    $prev_name = ($prev_name === '' ? $key.'_' : $prev_name.$key.'_');
+                    $prev_name = ($prev_name === '' ? $key . '_' : $prev_name . $key . '_');
 
-                    $temp = $this->get_fields_any($value, $message, $email, $nickname, $subject, $contact, $prev_name);
+                    $temp = $this->getFieldsAny($value, $message, $email, $nickname, $subject, $contact, $prev_name);
 
-                    $message 	= $temp['message'];
-                    $email 		= ($temp['email'] 		? $temp['email'] : null);
-                    $nickname 	= ($temp['nickname'] 	? $temp['nickname'] : null);
-                    $subject 	= ($temp['subject'] 	? $temp['subject'] : null);
-                    if($contact === true)
+                    $message = $temp['message'];
+                    $email = ($temp['email'] ? $temp['email'] : null);
+                    $nickname = ($temp['nickname'] ? $temp['nickname'] : null);
+                    $subject = ($temp['subject'] ? $temp['subject'] : null);
+                    if ( $contact === true ) {
                         $contact = ($temp['contact'] === false ? false : true);
-                    $prev_name 	= $prev_name_original;
+                    }
+                    $prev_name = $prev_name_original;
                 }
-            } unset($key, $value);
+            }
+            unset($key, $value);
         }
 
-        foreach ($skip_message_post as $v) {
-            if (isset($_POST[$v])) {
+        foreach ( $skip_message_post as $v ) {
+            if ( isset($_POST[$v]) ) {
                 $message = null;
                 break;
             }
-        } unset($v);
+        }
+        unset($v);
 
         //If top iteration, returns compiled name field. Example: "Nickname Firtsname Lastname".
-        if($prev_name === ''){
-            if(!empty($nickname)){
+        if ( $prev_name === '' ) {
+            if ( !empty($nickname) ) {
                 $nickname_str = '';
-                foreach($nickname as $value){
-                    $nickname_str .= ($value ? $value." " : "");
-                }unset($value);
+                foreach ( $nickname as $value ) {
+                    $nickname_str .= ($value ? $value . " " : "");
+                }
+                unset($value);
             }
             $nickname = $nickname_str;
         }
 
         $return_param = array(
-            'email' 	=> $email,
-            'nickname' 	=> $nickname,
-            'subject' 	=> $subject,
-            'contact' 	=> $contact,
-            'message' 	=> $message
+            'email' => $email,
+            'nickname' => $nickname,
+            'subject' => $subject,
+            'contact' => $contact,
+            'message' => $message
         );
         return $return_param;
     }
@@ -506,16 +521,17 @@ class Core
      * Masks a value with asterisks (*)
      * @return string
      */
-    private function obfuscate_param( $value = null ) {
-        if ($value && (!is_object($value) || !is_array($value))) {
+    private function obfuscateParam($value = null)
+    {
+        if ( $value && (!is_object($value) || !is_array($value)) ) {
             $length = strlen($value);
             $value = str_repeat('*', $length);
         }
         return $value;
     }
 
-    private function apbct_array( $array ){
-        return new Arr( $array );
+    private function apbctArray($array)
+    {
+        return new Arr($array);
     }
-
 }

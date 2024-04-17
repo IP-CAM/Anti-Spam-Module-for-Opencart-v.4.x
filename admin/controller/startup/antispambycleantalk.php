@@ -12,7 +12,7 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
 {
     public function index()
     {
-        if ( ! $this->registry->get('extension_antispambycleantalk_core') ) {
+        if ( !$this->registry->get('extension_antispambycleantalk_core') ) {
             $constructor_parameters = [
                 $this->registry->db,
                 $this->config

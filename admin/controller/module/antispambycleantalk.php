@@ -48,7 +48,11 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
 
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('text_extension'),
-            'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
+            'href' => $this->url->link(
+                'marketplace/extension',
+                'user_token=' . $this->session->data['user_token'] . '&type=module',
+                true
+            )
         );
 
         $data['breadcrumbs'][] = array(
@@ -56,9 +60,17 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             'href' => $this->url->link($this->path, 'user_token=' . $this->session->data['user_token'], true)
         );
 
-        $data['action'] = $this->url->link($this->path . '|save', 'user_token=' . $this->session->data['user_token'], true);
+        $data['action'] = $this->url->link(
+            $this->path . '|save',
+            'user_token=' . $this->session->data['user_token'],
+            true
+        );
 
-        $data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
+        $data['cancel'] = $this->url->link(
+            'marketplace/extension',
+            'user_token=' . $this->session->data['user_token'] . '&type=module',
+            true
+        );
 
 
         $data['header'] = $this->load->controller('common/header');
@@ -78,18 +90,22 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         $this->load->language($this->path);
         $json = [];
 
-        if (!$this->user->hasPermission('modify', $this->path)) {
+        if ( !$this->user->hasPermission('modify', $this->path) ) {
             $json['error'] = $this->language->get('error_permission');
         }
 
-        if (isset($this->request->post['module_antispambycleantalk_enable_sfw']) && isset($this->request->post['module_antispambycleantalk_access_key'])) {
-            $this->extension_antispambycleantalk_core->sfw->sfw_update($this->request->post['module_antispambycleantalk_access_key']);
-            $this->extension_antispambycleantalk_core->sfw->logs__send($this->request->post['module_antispambycleantalk_access_key']);
+        if ( isset($this->request->post['module_antispambycleantalk_enable_sfw']) && isset($this->request->post['module_antispambycleantalk_access_key']) ) {
+            $this->extension_antispambycleantalk_core->sfw->sfwUpdate(
+                $this->request->post['module_antispambycleantalk_access_key']
+            );
+            $this->extension_antispambycleantalk_core->sfw->logsSend(
+                $this->request->post['module_antispambycleantalk_access_key']
+            );
             $this->request->post['module_antispambycleantalk_int_sfw_last_check'] = time();
             $this->request->post['module_antispambycleantalk_int_sfw_last_send_logs'] = time();
         }
 
-        if (!$json) {
+        if ( !$json ) {
             $this->init();
             $this->load->model('setting/setting');
             $this->model_setting_setting->editSetting($this->module, $this->request->post);
@@ -104,18 +120,18 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
     {
         $this->model_setting_startup->deleteStartupByCode($this->module);
         $this->model_setting_startup->addStartup([
-            'code'			=> $this->module,
-            'description'	=> 'Anti-Spam by CleanTalk',
-            'action'		=> 'catalog/extension/antispambycleantalk/startup/antispambycleantalk',
-            'status'		=> true,
-            'sort_order'	=> 1
+            'code' => $this->module,
+            'description' => 'Anti-Spam by CleanTalk',
+            'action' => 'catalog/extension/antispambycleantalk/startup/antispambycleantalk',
+            'status' => true,
+            'sort_order' => 1
         ]);
         $this->model_setting_startup->addStartup([
-            'code'			=> $this->module,
-            'description'	=> 'Anti-Spam by CleanTalk',
-            'action'		=> 'admin/extension/antispambycleantalk/startup/antispambycleantalk',
-            'status'		=> true,
-            'sort_order'	=> 1
+            'code' => $this->module,
+            'description' => 'Anti-Spam by CleanTalk',
+            'action' => 'admin/extension/antispambycleantalk/startup/antispambycleantalk',
+            'status' => true,
+            'sort_order' => 1
         ]);
 
         $this->model_setting_event->deleteEventByCode($this->module);
@@ -165,42 +181,46 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             foreach ( $event_group as $event_name => $events ) {
                 foreach ( $events as $event ) {
                     $this->model_setting_event->addEvent([
-                        'code'			=> $this->module,
-                        'description'	=> 'Hook: Anti-Spam by CleanTalk ' . $event_description,
-                        'trigger'		=> $event,
-                        'action'		=> $event_name,
-                        'status'		=> true,
-                        'sort_order'	=> 1
+                        'code' => $this->module,
+                        'description' => 'Hook: Anti-Spam by CleanTalk ' . $event_description,
+                        'trigger' => $event,
+                        'action' => $event_name,
+                        'status' => true,
+                        'sort_order' => 1
                     ]);
                 }
             }
         }
 
-        $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "cleantalk_sfw` (
+        $this->db->query(
+            "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "cleantalk_sfw` (
             `network` int(10) unsigned NOT NULL, 
             `mask` int(10) unsigned NOT NULL, 
             `status` TINYINT(1) NOT NULL DEFAULT 0,
 		    INDEX (  `network` ,  `mask` )
-		)");
-        $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "cleantalk_sfw_logs` (
+		)"
+        );
+        $this->db->query(
+            "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "cleantalk_sfw_logs` (
             `ip` varchar(15) NOT NULL, 
             `all_entries` int(11) NOT NULL, 
             `blocked_entries` int(11) NOT NULL, 
             `entries_timestamp` int(11) NOT NULL, 
             PRIMARY KEY `ip` (`ip`)
-		)");
+		)"
+        );
     }
 
     public function install()
     {
-        if ($this->user->hasPermission('modify', $this->path)) {
+        if ( $this->user->hasPermission('modify', $this->path) ) {
             $this->init();
         }
     }
 
     public function uninstall()
     {
-        if ($this->user->hasPermission('modify', $this->path)) {
+        if ( $this->user->hasPermission('modify', $this->path) ) {
             $this->load->model('setting/setting');
             $this->model_setting_setting->deleteSetting($this->module);
             $this->model_setting_startup->deleteStartupByCode($this->module);
