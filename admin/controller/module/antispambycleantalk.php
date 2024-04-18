@@ -137,12 +137,12 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
         $this->model_setting_event->deleteEventByCode($this->module);
         $events = [
             'injecting JS to the document' => [
-                $this->event . '|injectJs' => [
+                $this->event . '.injectJs' => [
                     'catalog/controller/common/header/before',
                 ]
             ],
             'adding hidden field' => [
-                $this->event . '|addHiddenField' => [
+                $this->event . '.addHiddenField' => [
                     'catalog/view/account/register/after',
                     'catalog/view/checkout/register/after',
                     'catalog/view/account/returns_form',
@@ -151,9 +151,9 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
                 ]
             ],
             'checking register' => [
-                $this->event . '|checkRegister' => [
-                    'catalog/controller/account/register|register/before',
-                    'catalog/controller/checkout/register|save/before',
+                $this->event . '.checkRegister' => [
+                    'catalog/controller/account/register.register/before',
+                    'catalog/controller/checkout/register.save/before',
                 ]
             ],
             /*'checking order' => [
@@ -162,18 +162,18 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
                 ]
             ],*/
             'checking returns' => [
-                $this->event . '|checkReturns' => [
-                    'catalog/controller/account/returns|save/before',
+                $this->event . '.checkReturns' => [
+                    'catalog/controller/account/returns.save/before',
                 ]
             ],
             'checking contact form' => [
-                $this->event . '|checkContactForm' => [
-                    'catalog/controller/information/contact|send/before',
+                $this->event . '.checkContactForm' => [
+                    'catalog/controller/information/contact.send/before',
                 ]
             ],
             'checking reviews' => [
-                $this->event . '|checkReviews' => [
-                    'catalog/controller/product/review|write/before',
+                $this->event . '.checkReviews' => [
+                    'catalog/controller/product/review.write/before',
                 ]
             ],
         ];
