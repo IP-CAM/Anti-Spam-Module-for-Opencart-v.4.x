@@ -156,11 +156,14 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
                     'catalog/controller/checkout/register.save/before',
                 ]
             ],
-            /*'checking order' => [
-                $this->event . '|checkOrder' => [
-                    'catalog/controller/checkout/checkout/before',
+            'checking order' => [
+                $this->event . '.checkOrder' => [
+                    'catalog/controller/extension/opencart/payment/bank_transfer.confirm/before',
+                    'catalog/controller/extension/opencart/payment/cheque.confirm/before',
+                    'catalog/controller/extension/opencart/payment/cod.confirm/before',
+                    'catalog/controller/extension/opencart/payment/free_checkout.confirm/before',
                 ]
-            ],*/
+            ],
             'checking returns' => [
                 $this->event . '.checkReturns' => [
                     'catalog/controller/account/returns.save/before',

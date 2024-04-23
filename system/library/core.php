@@ -152,11 +152,10 @@ class Core
                 $ct_result = $this->onSpamCheck('register', $controller->request->post);
                 break;
             case 'order':
-                /** @var Customer $customer */
-                $customer = $controller->cart->customer;
-                $data['email'] = $customer->getEmail();
-                $data['firstname'] = $customer->getFirstName();
-                $data['lastname'] = $customer->getLastName();
+                $customer = $controller->session->data['customer'];
+                $data['email'] = isset($customer['email']) ? $customer['email'] : '';
+                $data['firstname'] = isset($customer['firstname']) ? $customer['firstname'] : '';
+                $data['lastname'] = isset($customer['lastname']) ? $customer['lastname'] : '';
                 $ct_result = $this->onSpamCheck('order', $data);
                 break;
             case 'comment':

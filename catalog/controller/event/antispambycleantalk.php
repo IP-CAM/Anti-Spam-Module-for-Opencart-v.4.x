@@ -76,11 +76,6 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             return;
         }
 
-        // Checkout: Skip checking for the guests checkout
-        if ( isset($this->request->post['account']) && $this->request->post['account'] === '0' ) {
-            return;
-        }
-
         $this->check('register');
     }
 
@@ -94,9 +89,6 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
      */
     public function checkOrder(&$route, &$args)
     {
-        // @todo Not implemented!
-        return;
-
         if (
             ! $this->config->get('module_antispambycleantalk_status') ||
             ! $this->config->get('module_antispambycleantalk_check_orders')
@@ -104,15 +96,11 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
             return;
         }
 
-        // Register: Skip checking if the $_POST is empty
-        if ( empty($this->request->post) ) {
+        if ( ! isset($this->session->data['customer']) ) {
             return;
         }
 
-        // Checkout: Check orders for only guests customers
-        if ( isset($this->request->post['account']) && $this->request->post['account'] === '0' ) {
-            $this->check('order');
-        }
+        $this->check('order');
     }
 
     /**
@@ -185,7 +173,11 @@ class AntispamByCleantalk extends \Opencart\System\Engine\Controller
     private function check($content_type = '')
     {
         if ( $this->extension_antispambycleantalk_core->isSpam($this, $content_type) ) {
-            $json['error']['warning'] = $this->extension_antispambycleantalk_core->get_block_comment();
+            if ( $content_type === 'order' ) {
+                $json['error'] = $this->extension_antispambycleantalk_core->getBlockComment();
+            } else {
+                $json['error']['warning'] = $this->extension_antispambycleantalk_core->getBlockComment();
+            }
             die(json_encode($json));
         }
     }
