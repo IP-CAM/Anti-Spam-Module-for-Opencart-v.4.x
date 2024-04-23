@@ -632,7 +632,7 @@ class SFW
                 $sfw_die_page
             );
 
-            die(htmlentities($sfw_die_page, ENT_QUOTES));
+            die($sfw_die_page);
         } else {
             die("IP BLACKLISTED");
         }
