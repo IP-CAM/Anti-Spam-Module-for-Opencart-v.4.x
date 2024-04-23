@@ -13,7 +13,7 @@ use Opencart\System\Library\Cart\Customer;
 
 class Core
 {
-    const VERSION = '1.0';
+    const VERSION = '1.1';
 
     /**
      * @var string
